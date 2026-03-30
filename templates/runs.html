@@ -1,0 +1,83 @@
+{% extends "base.html" %}
+
+{% block body %}
+<div class="panel">
+  <h2>Runs</h2>
+  <p class="muted">Run history is sourced from manifest files in output/runs/*/manifest.json.</p>
+</div>
+
+{% if role == 'admin' %}
+<div class="panel">
+  <h3>Start Generation</h3>
+  <form method="post" action="{{ url_for('admin_generate') }}">
+    <p>
+      <label>Input files (one path per line)<br />
+      <textarea name="input_files" rows="4" style="width:100%;padding:8px;">2020AUT-2021SUM.csv</textarea></label>
+    </p>
+    <p style="display:flex;gap:8px;flex-wrap:wrap;">
+      <label>Curriculum<br /><input name="curriculum" value="CSS" style="padding:8px;" /></label>
+      <label>Instructors<br />
+        <select name="instructor" multiple size="4" style="padding:8px;min-width:120px;">
+          <option value=".*" selected>All</option>
+          {% for instr in available_instructors %}
+            <option value="{{ instr }}">{{ instr }}</option>
+          {% endfor %}
+        </select>
+        <span class="muted" style="font-size:0.9em;">(Ctrl/Cmd+Click for multi-select)</span>
+      </label>
+      <label>Sections regex<br /><input name="sections" value=".*" style="padding:8px;" /></label>
+      <label>After term<br />
+        <select name="after" style="padding:8px;min-width:100px;">
+          <option value="">(none)</option>
+          {% for term in available_terms %}
+            <option value="{{ term }}">{{ term }}</option>
+          {% endfor %}
+        </select>
+      </label>
+      <label>Before term<br />
+        <select name="before" style="padding:8px;min-width:100px;">
+          <option value="">(none)</option>
+          {% for term in available_terms %}
+            <option value="{{ term }}">{{ term }}</option>
+          {% endfor %}
+        </select>
+      </label>
+    </p>
+    <p>
+      <label><input type="checkbox" name="include_histograms" checked /> Histograms</label>
+      <label><input type="checkbox" name="include_multiyear" checked /> Course multiyear</label>
+      <label><input type="checkbox" name="include_instructor_multiyear" /> Instructor multiyear</label>
+    </p>
+    <button type="submit">Generate</button>
+  </form>
+</div>
+{% endif %}
+
+<div class="panel">
+  <table>
+    <thead>
+      <tr>
+        <th>Run ID</th>
+        <th>Created</th>
+        <th>Artifacts</th>
+        <th>Inputs</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for run in manifests %}
+      <tr>
+        <td>
+          <a href="{{ url_for('run_artifacts', run_id=run.run_id) }}" title="View artifacts for this run">{{ run.run_id }}</a>
+        </td>
+        <td>{{ run.created_utc }}</td>
+        <td>{{ run.artifact_count }}</td>
+        <td class="muted">{{ run.inputs|join(', ') }}</td>
+      </tr>
+      {% endfor %}
+      {% if not manifests %}
+      <tr><td colspan="4" class="muted">No runs yet.</td></tr>
+      {% endif %}
+    </tbody>
+  </table>
+</div>
+{% endblock %}

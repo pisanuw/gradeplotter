@@ -1,0 +1,19 @@
+# Ignore Python cache and venv
+__pycache__/
+.venv/
+
+# Ignore generated output
+/gradeplotter_output/
+
+# Ignore legacy scripts (already deleted)
+/grade-analyzer.py
+/grade_analyzer_globals.py
+/grade_analyzer_plotter.py
+/grade-analyzer-all.sh
+
+# Ignore OS files
+.DS_Store
+
+# Ignore other artifacts
+*.pyc
+2020AUT-2021SUM.csv

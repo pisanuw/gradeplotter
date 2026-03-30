@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+
+{% block body %}
+<div class="panel">
+  <h2>Artifacts for Run {{ run_id }}</h2>
+  <a href="{{ url_for('runs') }}">&larr; Back to Runs</a>
+</div>
+<div class="panel">
+  {% set grouped = {} %}
+  {% for item in artifacts %}
+    {% set _ = grouped.setdefault(item.type, []).append(item) %}
+  {% endfor %}
+  {% if grouped %}
+    {% for type, items in grouped.items() %}
+      <h3>{{ type }} ({{ items|length }})</h3>
+      <ol>
+        {% for item in items %}
+          <li><a href="{{ url_for('artifact', artifact_path=item.path) }}" title="View artifact">{{ item.id }}</a></li>
+        {% endfor %}
+      </ol>
+    {% endfor %}
+  {% else %}
+    <div class="muted">No artifacts found for this run.</div>
+  {% endif %}
+</div>
+{% endblock %}
