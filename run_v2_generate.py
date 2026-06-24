@@ -39,6 +39,16 @@ def parse_args() -> argparse.Namespace:
         default=None,
         help="Generate drop/fail/withdraw/repeat report for a course (legacy parity)",
     )
+    parser.add_argument(
+        "--skip-unchanged",
+        action="store_true",
+        help="Skip files whose input data is identical to the previous run",
+    )
+    parser.add_argument(
+        "--instructor-config",
+        default=None,
+        help="Path to instructors.json mapping canonical names, netids, and full/part-time status",
+    )
     return parser.parse_args()
 
 
@@ -58,9 +68,14 @@ def main() -> None:
         combine_sections=args.combosections,
         combo_instructor=args.comboinstructor,
         dfw_report=args.dfwreport,
+        skip_unchanged=args.skip_unchanged,
+        instructor_config_path=Path(args.instructor_config) if args.instructor_config else None,
     )
     manifest = generate_artifacts(options)
-    print(f"Run {manifest['run_id']} created {manifest['artifact_count']} artifacts")
+    skipped = manifest.get("skipped_count", 0)
+    generated = manifest["artifact_count"] - skipped
+    msg = f"Run {manifest['run_id']}: {generated} generated, {skipped} skipped"
+    print(msg)
 
 
 if __name__ == "__main__":
